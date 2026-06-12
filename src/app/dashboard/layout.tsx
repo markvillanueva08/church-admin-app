@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import DashboardSidebar from "@/components/DashboardSidebar";
 import ClientSessionProvider from "@/components/ClientSessionProvider";
+import DashboardContent from "@/components/DashboardContent";
 
 export default async function DashboardLayout({
   children,
@@ -17,12 +17,9 @@ export default async function DashboardLayout({
 
   return (
     <ClientSessionProvider session={session}>
-      <div className="dashboard-layout">
-        <DashboardSidebar />
-        <main className="dashboard-main">
-          {children}
-        </main>
-      </div>
+      <DashboardContent>
+        {children}
+      </DashboardContent>
     </ClientSessionProvider>
   );
 }

@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import CardDataStats from "@/components/CardDataStats";
+import { Users, CalendarCheck, CalendarDays } from "lucide-react";
 
 const prisma = new PrismaClient();
 
@@ -12,51 +14,66 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div>
-      <div className="dashboard-header">
-        <h1 className="mb-2">Overview</h1>
-        <p className="text-muted">Welcome back. Here's what's happening today.</p>
+    <div className="space-y-6">
+      {/* Overview header */}
+      <div className="pb-5 border-b border-slate-200 dark:border-slate-800">
+        <h1 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">
+          Overview
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">
+          Welcome back. Here is what is happening today in your congregation.
+        </p>
       </div>
       
-      <div className="grid gap-6 mb-8" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))" }}>
-        <div className="card" style={{ padding: "1.5rem" }}>
-          <h3 className="mb-2 text-sm uppercase tracking-wide text-muted">Total Volunteers</h3>
-          <p style={{ fontSize: "2.5rem", fontWeight: "700", color: "var(--foreground)" }}>{usersCount}</p>
-        </div>
+      {/* Stat Cards Grid */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <CardDataStats title="Total Volunteers" total={usersCount}>
+          <Users size={24} />
+        </CardDataStats>
         
-        <div className="card" style={{ padding: "1.5rem" }}>
-          <h3 className="mb-2 text-sm uppercase tracking-wide text-muted">Upcoming Schedules</h3>
-          <p style={{ fontSize: "2.5rem", fontWeight: "700", color: "var(--foreground)" }}>{schedulesCount}</p>
-        </div>
+        <CardDataStats title="Upcoming Schedules" total={schedulesCount}>
+          <CalendarCheck size={24} />
+        </CardDataStats>
       </div>
 
-      <div className="card" style={{ padding: "1.5rem" }}>
-        <div className="flex justify-between items-center mb-6">
-          <h3>Upcoming Services</h3>
+      {/* Upcoming Services Section */}
+      <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <CalendarDays size={20} className="text-indigo-500" />
+            Upcoming Services
+          </h3>
         </div>
         
-        {upcomingEvents.length === 0 ? (
-          <p className="text-muted text-sm">No upcoming services found.</p>
-        ) : (
-          <div className="flex flex-col">
-            {upcomingEvents.map((event, i) => (
-              <div key={event.id} className="flex justify-between items-center" style={{ 
-                padding: "1rem 0", 
-                borderBottom: i === upcomingEvents.length - 1 ? "none" : "1px solid var(--border)" 
-              }}>
-                <div>
-                  <h4 style={{ fontSize: "1rem", fontWeight: "600", marginBottom: "0.25rem" }}>{event.title}</h4>
-                  <p className="text-muted text-sm">{event.description || "No description provided"}</p>
+        <div className="p-6">
+          {upcomingEvents.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+                No upcoming services scheduled.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+              {upcomingEvents.map((event) => (
+                <div key={event.id} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h4 className="text-base font-bold text-slate-800 dark:text-slate-100">
+                      {event.title}
+                    </h4>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+                      {event.description || "No description provided."}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-200">
+                      {event.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="badge badge-secondary">
-                    {event.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
