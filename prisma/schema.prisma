@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User Model
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  password      String?   
+  role          String    @default("USER") // SUPER_USER, LEADER, USER
+  phone         String?   
+  dateOfBirth   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  schedules     Schedule[]
+}
+
+// Service/Event Model
+model ServiceEvent {
+  id          String     @id @default(cuid())
+  title       String     
+  date        DateTime
+  location    String?
+  timeSlot    String?
+  description String?
+  schedules   Schedule[]
+}
+
+// Schedule/Assignment Model
+model Schedule {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  serviceEventId String
+  serviceEvent   ServiceEvent @relation(fields: [serviceEventId], references: [id])
+  teamName       String       
+  position       String       
+  status         String       @default("PENDING") 
+}
