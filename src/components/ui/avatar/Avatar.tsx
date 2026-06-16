@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { resolveImageSrc } from '@/lib/resolveImageSrc';
 import React from "react";
 
 interface AvatarProps {
@@ -42,10 +43,10 @@ const Avatar: React.FC<AvatarProps> = ({
     <div className={`relative  rounded-full ${sizeClasses[size]}`}>
       {/* Avatar Image */}
       <Image
-        width="0"
-        height="0"
+        width={0}
+        height={0}
         sizes="100vw"
-        src={src}
+        src={resolveImageSrc(src)}
         alt={alt}
         className="object-cover w-full rounded-full"
       />

@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 
 // Dynamically import the ReactApexChart component
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart: any = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 

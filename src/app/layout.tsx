@@ -1,10 +1,14 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import { Outfit } from 'next/font/google';
+import './globals.css';
+import "flatpickr/dist/flatpickr.css";
+import { SidebarProvider } from '@/context/SidebarContext';
+import { ThemeProvider } from '@/context/ThemeContext';
+import ClientErrorLogger from '@/components/ClientErrorLogger';
+import ClientErrorBoundary from '@/components/ClientErrorBoundary';
 
-export const metadata: Metadata = {
-  title: "Church Volunteer Database",
-  description: "A comprehensive platform to manage volunteers and schedules.",
-};
+const outfit = Outfit({
+  subsets: ["latin"],
+});
 
 export default function RootLayout({
   children,
@@ -13,8 +17,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
-        {children}
+      <body className={`${outfit.className} dark:bg-gray-900`}>
+        <ThemeProvider>
+          <SidebarProvider>
+            <ClientErrorLogger />
+            <ClientErrorBoundary>{children}</ClientErrorBoundary>
+          </SidebarProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

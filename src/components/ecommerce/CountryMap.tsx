@@ -1,10 +1,9 @@
-import React from "react";
 // import { VectorMap } from "@react-jvectormap/core";
-import { worldMill } from "@react-jvectormap/world";
 import dynamic from "next/dynamic";
+import React, { useEffect, useState } from "react";
 
-const VectorMap = dynamic(
-  () => import("@react-jvectormap/core").then((mod) => mod.VectorMap),
+const VectorMap: any = dynamic(
+  () => import("@react-jvectormap/core").then((mod) => mod.VectorMap as any),
   { ssr: false }
 );
 
@@ -33,16 +32,43 @@ type Marker = {
 };
 
 const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
+  const [mapData, setMapData] = useState<any | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const pkg = await import("@react-jvectormap/world");
+        if (!mounted) return;
+        setMapData((pkg && (pkg as any).worldMill) || (pkg && (pkg as any).default) || null);
+      } catch (err) {
+        // package not present — keep mapData null and render fallback
+        setMapData(null);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (!mapData) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center text-gray-500 dark:border-gray-800 dark:bg-white/[0.03]">
+        <p>Map not available. Install @react-jvectormap/world to enable this feature.</p>
+      </div>
+    );
+  }
+
   return (
     <VectorMap
-      map={worldMill}
+      map={mapData}
       backgroundColor="transparent"
       markerStyle={
         {
           initial: {
             fill: "#465FFF",
-            r: 4, // Custom radius for markers
-          }, // Type assertion to bypass strict CSS property checks
+            r: 4,
+          },
         } as MarkerStyle
       }
       markersSelectable={true}

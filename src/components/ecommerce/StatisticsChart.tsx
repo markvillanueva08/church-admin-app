@@ -6,7 +6,7 @@ import flatpickr from "flatpickr";
 import ChartTab from "../common/ChartTab";
 import { CalenderIcon } from "../../icons";
 
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const Chart: any = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default function StatisticsChart() {
   const datePickerRef = useRef<HTMLInputElement>(null);
@@ -51,6 +51,9 @@ export default function StatisticsChart() {
       type: "line", // Set the chart type to 'line'
       toolbar: {
         show: false, // Hide chart toolbar
+      },
+      animations: {
+        enabled: false,
       },
     },
     stroke: {

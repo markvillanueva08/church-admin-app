@@ -5,7 +5,7 @@ import { ApexOptions } from "apexcharts";
 
 import dynamic from "next/dynamic";
 // Dynamically import the ReactApexChart component
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart: any = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
@@ -23,6 +23,9 @@ export default function LineChartOne() {
       type: "line", // Set the chart type to 'line'
       toolbar: {
         show: false, // Hide chart toolbar
+      },
+      animations: {
+        enabled: false,
       },
     },
     stroke: {

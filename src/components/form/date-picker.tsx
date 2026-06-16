@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import Label from './Label';
 import { CalenderIcon } from '../../icons';
-import Hook = flatpickr.Options.Hook;
-import DateOption = flatpickr.Options.DateOption;
+// when flatpickr types are not available we'll accept any
+type Hook = any;
+type DateOption = any;
 
 type PropsType = {
   id: string;
@@ -24,18 +24,35 @@ export default function DatePicker({
   placeholder,
 }: PropsType) {
   useEffect(() => {
-    const flatPickr = flatpickr(`#${id}`, {
-      mode: mode || "single",
-      static: true,
-      monthSelectorType: "static",
-      dateFormat: "Y-m-d",
-      defaultDate,
-      onChange,
-    });
+    let fpInstance: any = null;
+
+    let mounted = true;
+    (async () => {
+      try {
+        const mod = await import('flatpickr');
+        const fp = (mod && (mod as any).default) || mod;
+        if (!mounted || !fp) return;
+        fpInstance = fp(`#${id}`, {
+          mode: mode || "single",
+          static: true,
+          monthSelectorType: "static",
+          dateFormat: "Y-m-d",
+          defaultDate,
+          onChange,
+        });
+      } catch (err) {
+        // flatpickr is optional; if it's not installed, just skip initializing
+        // This avoids build-time or runtime crashes when the package isn't present.
+        // You can install flatpickr to enable this component: npm install flatpickr
+      }
+    })();
 
     return () => {
-      if (!Array.isArray(flatPickr)) {
-        flatPickr.destroy();
+      mounted = false;
+      try {
+        if (fpInstance && typeof fpInstance.destroy === 'function') fpInstance.destroy();
+      } catch (e) {
+        /* ignore */
       }
     };
   }, [mode, onChange, id, defaultDate]);

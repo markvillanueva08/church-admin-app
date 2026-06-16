@@ -8,7 +8,7 @@ import { MoreDotIcon } from "@/icons";
 import { useState } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 // Dynamically import the ReactApexChart component
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart: any = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
@@ -45,7 +45,7 @@ export default function MonthlyTarget() {
             fontWeight: "600",
             offsetY: -40,
             color: "#1D2939",
-            formatter: function (val) {
+            formatter: function (val: any) {
               return val + "%";
             },
           },

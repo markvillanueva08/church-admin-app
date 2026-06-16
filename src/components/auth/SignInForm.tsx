@@ -3,13 +3,20 @@ import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
-import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
+import { ChevronLeft, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
@@ -17,7 +24,7 @@ export default function SignInForm() {
           href="/"
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
         >
-          <ChevronLeftIcon />
+          <ChevronLeft className="w-4 h-4 mr-2" aria-hidden="true" />
           Back to dashboard
         </Link>
       </div>
@@ -84,13 +91,45 @@ export default function SignInForm() {
                 </span>
               </div>
             </div>
-            <form>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setError(null);
+                setLoading(true);
+                try {
+                  const res = await signIn("credentials", {
+                    redirect: false,
+                    email,
+                    password,
+                  });
+
+                  // res may be undefined in some cases
+                  if (res && (res as any).ok) {
+                    // successful sign in
+                    router.push("/dashboard");
+                  } else {
+                    setError(
+                      (res && (res as any).error) || "Invalid credentials"
+                    );
+                  }
+                } catch (err) {
+                  setError("Sign in failed");
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            >
               <div className="space-y-6">
                 <div>
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input placeholder="info@gmail.com" type="email" />
+                  <Input
+                    placeholder="info@gmail.com"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
                 <div>
                   <Label>
@@ -100,15 +139,17 @@ export default function SignInForm() {
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
                     >
                       {showPassword ? (
-                        <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
+                        <Eye className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                       ) : (
-                        <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
+                        <EyeOff className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
                       )}
                     </span>
                   </div>
@@ -128,9 +169,14 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm">
-                    Sign in
+                  <Button className="w-full" size="sm" type="submit" disabled={loading}>
+                    {loading ? "Signing in..." : "Sign in"}
                   </Button>
+                  {error && (
+                    <p className="mt-2 text-sm text-error-500" role="alert">
+                      {error}
+                    </p>
+                  )}
                 </div>
               </div>
             </form>
