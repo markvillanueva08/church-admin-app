@@ -53,7 +53,7 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
 
   if (!mapData) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center text-gray-500 dark:border-gray-800 dark:bg-white/[0.03]">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center text-gray-500 dark:border-gray-800 dark:bg-white/3">
         <p>Map not available. Install @react-jvectormap/world to enable this feature.</p>
       </div>
     );
